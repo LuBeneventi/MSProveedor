@@ -34,4 +34,8 @@ public class proveedorService {
     public List<Proveedor> listarProveedores(){
         return proveedorRepository.findAll();
     }
+
+    public boolean existePorId(int id) {
+        return proveedorRepository.existsById(id);
+    }
 }
