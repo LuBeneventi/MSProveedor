@@ -49,9 +49,9 @@ public class proveedorController {
     }
 
     @PutMapping("/{id}/editar")
-    public Proveedor editarDatos(@RequestBody Proveedor proveedor, @PathVariable int id) {
+    public ResponseEntity<Proveedor> editarDatos(@RequestBody Proveedor proveedor, @PathVariable int id) {
         proveedor.setIdProveedor(id);;
-        return proveedorService.actualizarInfo(proveedor);
+        return ResponseEntity.ok(proveedorService.actualizarInfo(proveedor));
     }
 
     @DeleteMapping("/{id}/borrar")
