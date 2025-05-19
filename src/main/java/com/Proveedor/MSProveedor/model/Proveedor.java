@@ -22,7 +22,7 @@ public class Proveedor {
     @Column(length = 50, nullable = false)
     private String nomProv;
 
-    @Column(length = 250, nullable = false)
+    @Column(length = 250, nullable = false, unique = true)
     private String correoProv;
 
     @Column(length = 12, nullable = false)

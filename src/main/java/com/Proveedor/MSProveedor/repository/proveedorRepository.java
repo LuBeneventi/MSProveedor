@@ -7,5 +7,5 @@ import com.Proveedor.MSProveedor.model.Proveedor;
 
 @Repository
 public interface proveedorRepository extends JpaRepository<Proveedor, Integer>{
-    
+    Proveedor findByCorreoProv(String correoProv);
 }
