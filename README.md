@@ -1,17 +1,18 @@
-INSERT INTO `proveedor` (`id_proveedor`, `tel_prov`, `dir_prov`, `nom_prov`, `correo_prov`)
-VALUES (201, '555-1234', 'Av. Central 123, Ciudad A', 'Distribuciones El Sol', 'contacto@elsol.com');
+INSERT INTO `proveedor`(`id_proveedor`, `tel_prov`, `dir_prov`, `nom_prov`, `correo_prov`, `estado`) 
+VALUES (1, '5551234567', 'Calle 10 #45', 'Distribuidora El Sol', 'contacto@elsol.com', 'ACTIVO');
 
-INSERT INTO `proveedor` (`id_proveedor`, `tel_prov`, `dir_prov`, `nom_prov`, `correo_prov`)
-VALUES (202, '555-5678', 'Calle Falsa 456, Ciudad B', 'Suministros Globales S.A.', 'ventas@globalsa.com');
+INSERT INTO `proveedor`(`id_proveedor`, `tel_prov`, `dir_prov`, `nom_prov`, `correo_prov`, `estado`) 
+VALUES (2, '5559876543', 'Av. Las Palmas 123', 'Suministros Globales', 'ventas@globales.com', 'INACTIVO');
 
-INSERT INTO `proveedor` (`id_proveedor`, `tel_prov`, `dir_prov`, `nom_prov`, `correo_prov`)
-VALUES (203, '555-9012', 'Carrera 10 #45-67, Ciudad C', 'Importadora Nova', 'info@novaimport.com');
+INSERT INTO `proveedor`(`id_proveedor`, `tel_prov`, `dir_prov`, `nom_prov`, `correo_prov`, `estado`) 
+VALUES (3, '5552223344', 'Blvd. Reforma 99', 'TechPro SA', 'info@techpro.com', 'ACTIVO');
 
-INSERT INTO `proveedor` (`id_proveedor`, `tel_prov`, `dir_prov`, `nom_prov`, `correo_prov`)
-VALUES (204, '555-3456', 'Boulevard Industrial 789, Ciudad D', 'Grupo Abastece', 'soporte@abastece.com');
+INSERT INTO `proveedor`(`id_proveedor`, `tel_prov`, `dir_prov`, `nom_prov`, `correo_prov`, `estado`) 
+VALUES (4, '5556781234', 'Zona Industrial Km 8', 'Ferretería Central', 'ferrecentral@correo.com', 'INACTIVO');
 
-INSERT INTO `proveedor` (`id_proveedor`, `tel_prov`, `dir_prov`, `nom_prov`, `correo_prov`)
-VALUES (205, '555-7890', 'Zona Franca Km 12, Ciudad E', 'Comercializadora Andes', 'clientes@andesco.com');
+INSERT INTO `proveedor`(`id_proveedor`, `tel_prov`, `dir_prov`, `nom_prov`, `correo_prov`, `estado`) 
+VALUES (5, '5553344556', 'Parque Industrial #12', 'Alimentos del Norte', 'proveedor@alnorte.com', 'ACTIVO');
+
 
 
 {

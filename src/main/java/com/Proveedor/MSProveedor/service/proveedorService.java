@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.Proveedor.MSProveedor.model.Proveedor;
+import com.Proveedor.MSProveedor.model.estadoProveedor;
 import com.Proveedor.MSProveedor.repository.proveedorRepository;
 
 @Service
@@ -22,6 +23,7 @@ public class proveedorService {
         if(existente != null){
            new ResponseEntity<>(HttpStatus.CONFLICT);
         }
+        proveedor.setEstado(estadoProveedor.ACTIVO);
         return proveedorRepository.save(proveedor);
     }
 
@@ -29,8 +31,22 @@ public class proveedorService {
         return proveedorRepository.save(proveedor);
     }
 
-    public void eliminarProveedor(int id) {
-        proveedorRepository.deleteById(id);
+    public Proveedor activaProveedor(int id){
+        Proveedor buscado = proveedorRepository.findById(id).orElseThrow();
+        if(buscado.getEstado() == estadoProveedor.INACTIVO){
+            buscado.setEstado(estadoProveedor.ACTIVO);
+            return proveedorRepository.save(buscado);
+        }
+        throw new IllegalStateException("Es proveedor ya esta activo");
+    }
+
+    public Proveedor desactivaProveedor(int id){
+        Proveedor buscado = proveedorRepository.findById(id).orElseThrow();
+        if(buscado.getEstado() == estadoProveedor.ACTIVO){
+            buscado.setEstado(estadoProveedor.INACTIVO);
+            return proveedorRepository.save(buscado);
+        }
+        throw new IllegalStateException("Es proveedor ya esta inactivo");
     }
 
     public Optional<Proveedor> buscarProveedor(int id) {
