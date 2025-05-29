@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Proveedor.MSProveedor.model.Proveedor;
+import com.Proveedor.MSProveedor.model.estadoProveedor;
 import com.Proveedor.MSProveedor.service.proveedorService;
 
 @RestController
@@ -28,6 +29,7 @@ public class proveedorController {
         if(proveedor.getIdProveedor() != 0 && proveedorService.existePorId(proveedor.getIdProveedor())){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+        proveedor.setEstado(estadoProveedor.ACTIVO);
         return new ResponseEntity<>(proveedorService.registrarProveedor(proveedor), HttpStatus.OK);
     }
 
