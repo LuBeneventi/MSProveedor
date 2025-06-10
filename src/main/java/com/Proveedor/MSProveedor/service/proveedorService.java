@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.Proveedor.MSProveedor.model.Proveedor;
@@ -21,7 +19,7 @@ public class proveedorService {
     public Proveedor registrarProveedor(Proveedor proveedor) {
         Proveedor existente = proveedorRepository.findByCorreoProv(proveedor.getCorreoProv());
         if(existente != null){
-           new ResponseEntity<>(HttpStatus.CONFLICT);
+           throw new IllegalStateException("Correo ya registrado");
         }
         proveedor.setEstado(estadoProveedor.ACTIVO);
         return proveedorRepository.save(proveedor);
@@ -37,7 +35,7 @@ public class proveedorService {
             buscado.setEstado(estadoProveedor.ACTIVO);
             return proveedorRepository.save(buscado);
         }
-        throw new IllegalStateException("Es proveedor ya esta activo");
+        throw new IllegalStateException("Este proveedor ya esta activo");
     }
 
     public Proveedor desactivaProveedor(int id){
@@ -46,7 +44,7 @@ public class proveedorService {
             buscado.setEstado(estadoProveedor.INACTIVO);
             return proveedorRepository.save(buscado);
         }
-        throw new IllegalStateException("Es proveedor ya esta inactivo");
+        throw new IllegalStateException("Este proveedor ya esta inactivo");
     }
 
     public Optional<Proveedor> buscarProveedor(int id) {

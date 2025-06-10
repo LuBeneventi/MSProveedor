@@ -18,7 +18,7 @@ import com.Proveedor.MSProveedor.model.estadoProveedor;
 import com.Proveedor.MSProveedor.service.proveedorService;
 
 @RestController
-@RequestMapping("api/proveedor")
+@RequestMapping("api/v1/proveedor")
 public class proveedorController {
     
     @Autowired
@@ -51,7 +51,7 @@ public class proveedorController {
 
     @PutMapping("/{id}/editar")
     public ResponseEntity<Proveedor> editarDatos(@RequestBody Proveedor proveedor, @PathVariable int id) {
-        proveedor.setIdProveedor(id);;
+        proveedor.setIdProveedor(id);
         return ResponseEntity.ok(proveedorService.actualizarInfo(proveedor));
     }
 
