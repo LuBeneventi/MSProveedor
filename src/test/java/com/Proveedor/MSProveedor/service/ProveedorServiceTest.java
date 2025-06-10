@@ -9,6 +9,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -69,16 +70,47 @@ class ProveedorServiceTest {
 
     @Test
     void TestActualizarInfo() {
-        Proveedor proveedor = new Proveedor();
-        proveedor.setCorreoProv("proveedor@correo.com");
-        proveedor.setEstado(estadoProveedor.ACTIVO);
+        Proveedor existente = new Proveedor(1, "Antiguo", "antiguo@mail.com", estadoProveedor.ACTIVO,"1111", "Calle 1");
+        Proveedor nuevo = new Proveedor(1, "Nuevo", "nuevo@mail.com", estadoProveedor.ACTIVO,"2222", "Calle 2");
 
-        when(pRepo.save(proveedor)).thenReturn(proveedor);
+        when(pRepo.findById(1)).thenReturn(Optional.of(existente));
+        when(pRepo.findByCorreoProv("nuevo@mail.com")).thenReturn(null);
+        when(pRepo.save(any(Proveedor.class))).thenAnswer(i -> i.getArgument(0));
 
-        Proveedor resultado = pService.actualizarInfo(proveedor);
+        Proveedor actualizado = pService.actualizarInfo(1, nuevo);
 
-        assertThat(resultado).isEqualTo(proveedor);
-        verify(pRepo).save(proveedor);
+        assertEquals("Nuevo", actualizado.getNomProv());
+        assertEquals("nuevo@mail.com", actualizado.getCorreoProv());
+        assertEquals("2222", actualizado.getTelProv());
+        assertEquals("Calle 2", actualizado.getDirProv());
+
+        verify(pRepo).save(existente);
+    }
+    @Test
+    void TestProveedorNoExiste() {
+        Proveedor nuevo = new Proveedor(1, "Nuevo", "nuevo@mail.com", estadoProveedor.ACTIVO ,"2222", "Calle 2");
+
+        when(pRepo.findById(1)).thenReturn(Optional.empty());
+
+        NoSuchElementException exception = assertThrows(NoSuchElementException.class, () ->
+                pService.actualizarInfo(1, nuevo));
+
+        assertEquals("Proveedor no encontrado", exception.getMessage());
+    }
+
+    @Test
+    void TestCorreoProveedorYaExiste() {
+        Proveedor existente = new Proveedor(1, "Antiguo", "antiguo@mail.com", estadoProveedor.ACTIVO,"1111", "Calle 1");
+        Proveedor nuevo = new Proveedor(1, "Nuevo", "usado@mail.com",estadoProveedor.ACTIVO, "2222", "Calle 2");
+        Proveedor otroProveedor = new Proveedor(2, "Otro", "usado@mail.com",estadoProveedor.ACTIVO, "3333", "Calle 3");
+
+        when(pRepo.findById(1)).thenReturn(Optional.of(existente));
+        when(pRepo.findByCorreoProv("usado@mail.com")).thenReturn(otroProveedor);
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () ->
+                pService.actualizarInfo(1, nuevo));
+
+        assertEquals("El correo ya está registrado por otro proveedor.", exception.getMessage());
     }
 
     @Test
