@@ -5,6 +5,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -34,6 +35,7 @@ class ProveedorServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    // Guardar proveedores
     @Test
     void testGuardarProveedor() {
         Proveedor proveedor = new Proveedor(0, "Carniceria Martinez", "camartinez@gmail.com", null, "54528785",
@@ -49,6 +51,7 @@ class ProveedorServiceTest {
         verify(pRepo).save(proveedor);
     }
 
+    // Guardar proveedores - Comprobar si el correo registrado ya existe.
     @Test
     void TestCorreoExistente() {
         Proveedor existente = new Proveedor();
@@ -68,10 +71,12 @@ class ProveedorServiceTest {
         verify(pRepo, never()).save(any());
     }
 
+    // Actualizar proveedores
     @Test
     void TestActualizarInfo() {
-        Proveedor existente = new Proveedor(1, "Antiguo", "antiguo@mail.com", estadoProveedor.ACTIVO,"1111", "Calle 1");
-        Proveedor nuevo = new Proveedor(1, "Nuevo", "nuevo@mail.com", estadoProveedor.ACTIVO,"2222", "Calle 2");
+        Proveedor existente = new Proveedor(1, "Antiguo", "antiguo@mail.com", estadoProveedor.ACTIVO, "1111",
+                "Calle 1");
+        Proveedor nuevo = new Proveedor(1, "Nuevo", "nuevo@mail.com", estadoProveedor.ACTIVO, "2222", "Calle 2");
 
         when(pRepo.findById(1)).thenReturn(Optional.of(existente));
         when(pRepo.findByCorreoProv("nuevo@mail.com")).thenReturn(null);
@@ -86,33 +91,38 @@ class ProveedorServiceTest {
 
         verify(pRepo).save(existente);
     }
+
+    // Actualizar proveedores - Error si el proveedor actualizado no existe
     @Test
     void TestProveedorNoExiste() {
-        Proveedor nuevo = new Proveedor(1, "Nuevo", "nuevo@mail.com", estadoProveedor.ACTIVO ,"2222", "Calle 2");
+        Proveedor nuevo = new Proveedor(1, "Nuevo", "nuevo@mail.com", estadoProveedor.ACTIVO, "2222", "Calle 2");
 
         when(pRepo.findById(1)).thenReturn(Optional.empty());
 
-        NoSuchElementException exception = assertThrows(NoSuchElementException.class, () ->
-                pService.actualizarInfo(1, nuevo));
+        NoSuchElementException exception = assertThrows(NoSuchElementException.class,
+                () -> pService.actualizarInfo(1, nuevo));
 
         assertEquals("Proveedor no encontrado", exception.getMessage());
     }
 
+    // Actualizar proveedores - Ver si el correo ya existe
     @Test
     void TestCorreoProveedorYaExiste() {
-        Proveedor existente = new Proveedor(1, "Antiguo", "antiguo@mail.com", estadoProveedor.ACTIVO,"1111", "Calle 1");
-        Proveedor nuevo = new Proveedor(1, "Nuevo", "usado@mail.com",estadoProveedor.ACTIVO, "2222", "Calle 2");
-        Proveedor otroProveedor = new Proveedor(2, "Otro", "usado@mail.com",estadoProveedor.ACTIVO, "3333", "Calle 3");
+        Proveedor existente = new Proveedor(1, "Antiguo", "antiguo@mail.com", estadoProveedor.ACTIVO, "1111",
+                "Calle 1");
+        Proveedor nuevo = new Proveedor(1, "Nuevo", "usado@mail.com", estadoProveedor.ACTIVO, "2222", "Calle 2");
+        Proveedor otroProveedor = new Proveedor(2, "Otro", "usado@mail.com", estadoProveedor.ACTIVO, "3333", "Calle 3");
 
         when(pRepo.findById(1)).thenReturn(Optional.of(existente));
         when(pRepo.findByCorreoProv("usado@mail.com")).thenReturn(otroProveedor);
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () ->
-                pService.actualizarInfo(1, nuevo));
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> pService.actualizarInfo(1, nuevo));
 
         assertEquals("El correo ya está registrado por otro proveedor.", exception.getMessage());
     }
 
+    // Activar proveedores
     @Test
     void TestActivarProveedor() {
         Proveedor inactivo = new Proveedor();
@@ -132,6 +142,7 @@ class ProveedorServiceTest {
         verify(pRepo).save(inactivo);
     }
 
+    // Activar proveedores - Ver si se intenta activar un proveedor ya activo
     @Test
     void TestActivarProveedorYaActivo() {
         Proveedor activo = new Proveedor();
@@ -148,6 +159,7 @@ class ProveedorServiceTest {
         verify(pRepo, never()).save(any());
     }
 
+    // Activar proveedores - Activar un proveedor que no existe
     @Test
     void TestActivarNoExistente() {
         // Arrange
@@ -161,6 +173,7 @@ class ProveedorServiceTest {
         verify(pRepo, never()).save(any());
     }
 
+    // Desactivar proveedores
     @Test
     void TestDesactivarProveedor() {
         Proveedor inactivo = new Proveedor();
@@ -180,6 +193,7 @@ class ProveedorServiceTest {
         verify(pRepo).save(activado);
     }
 
+    // Desactivar proveedores - Desactivar proveedor ya desactivado
     @Test
     void TestDesactivarProveedorYaInactivo() {
         Proveedor inactivo = new Proveedor();
@@ -196,6 +210,7 @@ class ProveedorServiceTest {
         verify(pRepo, never()).save(any());
     }
 
+    // Desactivar proveedores - Desactivar proveedor que no existe
     @Test
     void TestDesactivarNoExistente() {
         when(pRepo.findById(3)).thenReturn(Optional.empty());
@@ -205,6 +220,85 @@ class ProveedorServiceTest {
         });
 
         verify(pRepo, never()).save(any());
+    }
+
+    // Buscar Proveedor
+    @Test
+    void TestBuscarProveedor() {
+        Proveedor nuevo = new Proveedor();
+        nuevo.setIdProveedor(1);
+
+        when(pRepo.findById(1)).thenReturn(Optional.of(nuevo));
+
+        Optional<Proveedor> Resultado = pService.buscarProveedor(1);
+
+        assertThat(Resultado).isPresent();
+        assertEquals(1, Resultado.get().getIdProveedor());
+        verify(pRepo).findById(1);
+    }
+
+    // Buscar Proveedor - Si el proveedor no existe
+    @Test
+    void TestBuscarProveedorInexistente() {
+        int id = 99;
+        when(pRepo.findById(id)).thenReturn(Optional.empty());
+
+        Optional<Proveedor> Resultado = pService.buscarProveedor(id);
+
+        assertThat(Resultado).isNotPresent();
+        verify(pRepo).findById(id);
+    }
+
+    // Buscar todos los proveedores
+    @Test
+    void TestListarProveedores() {
+        Proveedor proveedor1 = new Proveedor();
+        proveedor1.setIdProveedor(1);
+        Proveedor proveedor2 = new Proveedor();
+        proveedor2.setIdProveedor(2);
+
+        List<Proveedor> proveedores = List.of(proveedor1, proveedor2);
+        when(pRepo.findAll()).thenReturn(proveedores);
+
+        List<Proveedor> resultado = pService.listarProveedores();
+
+        assertThat(resultado).isNotEmpty();
+        assertThat(resultado).hasSize(2).contains(proveedor1, proveedor2);
+        verify(pRepo).findAll();
+    }
+
+    // Buscar todos los proveedores - La lista esta vacia
+    @Test
+    void TestListaVacia() {
+        when(pRepo.findAll()).thenReturn(List.of());
+
+        List<Proveedor> resultado = pService.listarProveedores();
+
+        assertThat(resultado).isEmpty();
+        verify(pRepo).findAll();
+    }
+
+    // Comprobar si el id existe
+    @Test
+    void TestExisteElID() {
+        int id = 1;
+        when(pRepo.existsById(id)).thenReturn(true);
+
+        boolean resultado = pService.existePorId(id);
+
+        assertThat(resultado).isTrue();
+        verify(pRepo).existsById(id);
+    }
+    // Comprobar si el id existe - Caso que este no exista
+    @Test
+    void TestNoExisteElID() {
+        int id = 999;
+        when(pRepo.existsById(id)).thenReturn(false);
+
+        boolean resultado = pService.existePorId(id);
+
+        assertThat(resultado).isFalse();
+        verify(pRepo).existsById(id);
     }
 
 }
