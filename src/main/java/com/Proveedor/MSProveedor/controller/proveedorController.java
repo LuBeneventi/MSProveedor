@@ -20,23 +20,23 @@ import com.Proveedor.MSProveedor.service.proveedorService;
 @RestController
 @RequestMapping("api/v1/proveedor")
 public class proveedorController {
-    
+
     @Autowired
     private proveedorService proveedorService;
 
-    @PostMapping("/registro")
-    public ResponseEntity<?> registrar(@RequestBody Proveedor proveedor){
-        if(proveedor.getIdProveedor() != 0 && proveedorService.existePorId(proveedor.getIdProveedor())){
+    @PostMapping
+    public ResponseEntity<Proveedor> registrar(@RequestBody Proveedor proveedor) {
+        if (proveedor.getIdProveedor() != 0 && proveedorService.existePorId(proveedor.getIdProveedor())) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         proveedor.setEstado(estadoProveedor.ACTIVO);
         return new ResponseEntity<>(proveedorService.registrarProveedor(proveedor), HttpStatus.OK);
     }
 
-     @GetMapping
+    @GetMapping
     public ResponseEntity<List<Proveedor>> listar() {
         List<Proveedor> proveedores = proveedorService.listarProveedores();
-        if(proveedores.isEmpty()){
+        if (proveedores.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return ResponseEntity.ok(proveedorService.listarProveedores());
@@ -49,26 +49,36 @@ public class proveedorController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/{id}/editar")
+    @PutMapping("/{id}")
     public ResponseEntity<Proveedor> editarDatos(@RequestBody Proveedor proveedor, @PathVariable int id) {
-        Proveedor actualizado = proveedorService.actualizarInfo(id,proveedor);
-        return ResponseEntity.ok(actualizado);
+        try {
+            Proveedor actualizado = proveedorService.actualizarInfo(id, proveedor);
+            if (actualizado != null) {
+                return ResponseEntity.ok(actualizado);
+            } else {
+                return ResponseEntity.notFound().build();
+
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+
     }
 
     @PutMapping("/{id}/activar")
-    public ResponseEntity<Proveedor> activarProv(@PathVariable int id){
-        try{
+    public ResponseEntity<Proveedor> activarProv(@PathVariable int id) {
+        try {
             return ResponseEntity.ok(proveedorService.activaProveedor(id));
-        }catch(Exception e){
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
 
     @PutMapping("/{id}/desactivar")
-    public ResponseEntity<Proveedor> desactivarProv(@PathVariable int id){
-        try{
+    public ResponseEntity<Proveedor> desactivarProv(@PathVariable int id) {
+        try {
             return ResponseEntity.ok(proveedorService.desactivaProveedor(id));
-        }catch(Exception e){
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
