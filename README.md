@@ -13,7 +13,7 @@ VALUES (4, '5556781234', 'Zona Industrial Km 8', 'Ferretería Central', 'ferrece
 INSERT INTO `proveedor`(`id_proveedor`, `tel_prov`, `dir_prov`, `nom_prov`, `correo_prov`, `estado`) 
 VALUES (5, '5553344556', 'Parque Industrial #12', 'Alimentos del Norte', 'proveedor@alnorte.com', 'ACTIVO');
 
-
+http://localhost:8081/swagger-ui/index.html#/
 
 {
   "nomProv": "Insumos Agrícolas Luján",
