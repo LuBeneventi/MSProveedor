@@ -81,10 +81,14 @@ public class proveedorControllerV2 {
     public ResponseEntity<EntityModel<Proveedor>> editarDatos(@RequestBody Proveedor proveedor, @PathVariable int id) {
         try {
             Proveedor actualizado = pService.actualizarInfo(id, proveedor);
-            return ResponseEntity
-                    .ok(assembler.toModel(actualizado));
+            if (actualizado != null) {
+                return ResponseEntity
+                        .ok(assembler.toModel(actualizado));
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.badRequest().build();
         }
     }
 

@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -80,8 +79,8 @@ class proveedorControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.length()").value(2))
-                                .andExpect(jsonPath("$._embedded.proveedorList[0].nomProv").value("Carnes Mauricio"))
-                                .andExpect(jsonPath("$._embedded.proveedorList[1].nomProv").value("Lacosta"));
+                                .andExpect(jsonPath("$[0].nomProv").value("Carnes Mauricio"))
+                                .andExpect(jsonPath("$[1].nomProv").value("Lacosta"));
         }
 
         @Test // Listar Proveedores - Lista Vacia
@@ -105,11 +104,10 @@ class proveedorControllerTest {
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.idProveedor").value(5))
                                 .andExpect(jsonPath("$.nomProv").value("Costa"))
-                                .andExpect(jsonPath("$._links.self.href").exists())
-                                .andExpect(jsonPath("$._links.lista-proveedores.href").exists())
-                                .andExpect(jsonPath("$._links.activar.href").exists())
-                                .andExpect(jsonPath("$._links.desactivar.href").exists());
-
+                                .andExpect(jsonPath("$.correoProv").value("costa1998@gmail.com"))
+                                .andExpect(jsonPath("$.estado").value("ACTIVO"))
+                                .andExpect(jsonPath("$.telProv").value("+56921546938"))
+                                .andExpect(jsonPath("$.dirProv").value("Los Canarios 4578"));
         }
 
         @Test // Obtener Proveedor - No existe el proveedor buscado
@@ -123,6 +121,9 @@ class proveedorControllerTest {
 
         @Test // Editar datos de proveedor
         void EditarTestOK() throws Exception {
+                Proveedor original = new Proveedor(10, "Castle", "castle@gmail.com", estadoProveedor.ACTIVO,
+                                "+56978124545", "Las amapolas 127");
+
                 Proveedor actualizado = new Proveedor(10, "Marco Polo", "marcopolo@gmail.com", estadoProveedor.ACTIVO,
                                 "+56997856323", "Las Rosas 7425");
 
@@ -130,10 +131,16 @@ class proveedorControllerTest {
 
                 mockMvc.perform(put("/api/v1/proveedor/10")
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(actualizado)))
                                 .andExpect(status().isOk())
+                                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                                 .andExpect(jsonPath("$.idProveedor").value(10))
-                                .andExpect(jsonPath("$.nomProv").value("Marco Polo"));
+                                .andExpect(jsonPath("$.nomProv").value("Marco Polo"))
+                                .andExpect(jsonPath("$.correo").value("marcopolo@gmail.com"))
+                                .andExpect(jsonPath("$.estado").value("ACTIVO"))
+                                .andExpect(jsonPath("$.telefono").value("+56997856323"))
+                                .andExpect(jsonPath("$.direccion").value("Las Rosas 7425"));
         }
 
         @Test // Editar datos de proveedor - ID no vinculado a ningun Proveedor
