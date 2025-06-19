@@ -2,11 +2,6 @@ package com.Proveedor.MSProveedor.controller;
 
 import java.util.List;
 
-import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
-import java.util.stream.Collectors;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,44 +34,19 @@ public class proveedorController {
     }
 
     @GetMapping
-    public ResponseEntity<CollectionModel<EntityModel<Proveedor>>> listar() {
+    public ResponseEntity<List<Proveedor>> listar() {
         List<Proveedor> proveedores = proveedorService.listarProveedores();
-    if (proveedores.isEmpty()) {
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    List<EntityModel<Proveedor>> proveedoresConLinks = proveedores.stream()
-        .map(proveedor -> {
-            EntityModel<Proveedor> recurso = EntityModel.of(proveedor);
-
-            recurso.add(linkTo(methodOn(proveedorController.class).obtener(proveedor.getIdProveedor())).withSelfRel());
-            return recurso;
-        })
-        .collect(Collectors.toList());
-
-    CollectionModel<EntityModel<Proveedor>> collectionModel = CollectionModel.of(proveedoresConLinks);
-
-    collectionModel.add(linkTo(methodOn(proveedorController.class).listar()).withSelfRel());
-
-    return ResponseEntity.ok(collectionModel);
+        if (proveedores.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return ResponseEntity.ok(proveedorService.listarProveedores());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<Proveedor>> obtener(@PathVariable int id) {
+    public ResponseEntity<Proveedor> obtener(@PathVariable int id) {
         return proveedorService.buscarProveedor(id)
-        .map(proveedor -> {
-            EntityModel<Proveedor> recurso = EntityModel.of(proveedor);
-
-            recurso.add(linkTo(methodOn(proveedorController.class).obtener(id)).withSelfRel());
-
-            recurso.add(linkTo(methodOn(proveedorController.class).listar()).withRel("lista-proveedores"));
-
-            recurso.add(linkTo(methodOn(proveedorController.class).activarProv(id)).withRel("activar"));
-            recurso.add(linkTo(methodOn(proveedorController.class).desactivarProv(id)).withRel("desactivar"));
-
-            return ResponseEntity.ok(recurso);
-        })
-        .orElse(ResponseEntity.notFound().build());
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
