@@ -137,10 +137,10 @@ class proveedorControllerTest {
                                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                                 .andExpect(jsonPath("$.idProveedor").value(10))
                                 .andExpect(jsonPath("$.nomProv").value("Marco Polo"))
-                                .andExpect(jsonPath("$.correo").value("marcopolo@gmail.com"))
+                                .andExpect(jsonPath("$.correoProv").value("marcopolo@gmail.com"))
                                 .andExpect(jsonPath("$.estado").value("ACTIVO"))
-                                .andExpect(jsonPath("$.telefono").value("+56997856323"))
-                                .andExpect(jsonPath("$.direccion").value("Las Rosas 7425"));
+                                .andExpect(jsonPath("$.telProv").value("+56997856323"))
+                                .andExpect(jsonPath("$.dirProv").value("Las Rosas 7425"));
         }
 
         @Test // Editar datos de proveedor - ID no vinculado a ningun Proveedor
