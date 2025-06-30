@@ -19,14 +19,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.hateoas.EntityModel;
+import org.springframework.context.annotation.Import;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.hamcrest.Matchers.containsString;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-
 import com.Proveedor.MSProveedor.assembler.ProveedorModelAssembler;
 import com.Proveedor.MSProveedor.model.Proveedor;
 import com.Proveedor.MSProveedor.model.estadoProveedor;
@@ -34,6 +31,7 @@ import com.Proveedor.MSProveedor.service.proveedorService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(proveedorControllerV2.class)
+@Import(ProveedorModelAssembler.class)
 public class proveedorControllerV2Test {
         @Autowired
         private MockMvc mockMvc;
@@ -42,8 +40,7 @@ public class proveedorControllerV2Test {
         @MockBean
         private proveedorService pService;
 
-        @SuppressWarnings("removal")
-        @MockBean
+        @Autowired
         private ProveedorModelAssembler assembler;
 
         @Autowired
@@ -58,9 +55,6 @@ public class proveedorControllerV2Test {
 
                 when(pService.listarProveedores()).thenReturn(List.of(p1, p2));
 
-                when(assembler.toModel(p1)).thenReturn(EntityModel.of(p1));
-                when(assembler.toModel(p2)).thenReturn(EntityModel.of(p2));
-
                 mockMvc.perform(get("/api/v2/proveedor")
                                 .accept(MediaTypes.HAL_JSON))
                                 .andExpect(status().isOk())
@@ -69,7 +63,20 @@ public class proveedorControllerV2Test {
                                 .andExpect(jsonPath("_embedded.proveedorList.length()").value(2))
                                 .andExpect(jsonPath("_embedded.proveedorList[0].idProveedor").value(10))
                                 .andExpect(jsonPath("_embedded.proveedorList[0].nomProv").value("Carnes Mauricio"))
-                                .andExpect(jsonPath("_links.self").exists());
+                                .andExpect(jsonPath("_embedded.proveedorList[1].idProveedor").value(1))
+                                .andExpect(jsonPath("_embedded.proveedorList[1].nomProv").value("Lacosta"))
+                                .andExpect(jsonPath("_links.self").exists())
+                                .andExpect(jsonPath("_embedded.proveedorList[0]._links.self.href").exists())
+                                .andExpect(jsonPath("_embedded.proveedorList[0]._links.proveedor.href").exists())
+                                .andExpect(jsonPath("_embedded.proveedorList[0]._links.desactivar.href").exists())
+                                .andExpect(jsonPath("_embedded.proveedorList[0]._links.editar.href").exists())
+                                .andExpect(jsonPath("_embedded.proveedorList[0]._links.activar.href").exists())
+                                .andExpect(jsonPath("_embedded.proveedorList[0]._links.desactivar.href").exists())
+                                .andExpect(jsonPath("_embedded.proveedorList[1]._links.self.href").exists())
+                                .andExpect(jsonPath("_embedded.proveedorList[1]._links.proveedor.href").exists())
+                                .andExpect(jsonPath("_embedded.proveedorList[1]._links.editar.href").exists())
+                                .andExpect(jsonPath("_embedded.proveedorList[1]._links.activar.href").exists())
+                                .andExpect(jsonPath("_embedded.proveedorList[1]._links.desactivar.href").exists());
         }
 
         @Test // Listar Proveedores - No hay proveedores registrados
@@ -88,13 +95,6 @@ public class proveedorControllerV2Test {
 
                 when(pService.buscarProveedor(5)).thenReturn(Optional.of(nuevo));
 
-                EntityModel<Proveedor> modelConLinks = EntityModel.of(nuevo,
-                                linkTo(methodOn(proveedorControllerV2.class).Obtener(nuevo.getIdProveedor()))
-                                                .withSelfRel(),
-                                linkTo(methodOn(proveedorControllerV2.class).listar()).withRel("proveedor"));
-
-                when(assembler.toModel(nuevo)).thenReturn(modelConLinks);
-
                 mockMvc.perform(get("/api/v2/proveedor/5")
                                 .accept(MediaTypes.HAL_JSON))
                                 .andExpect(status().isOk())
@@ -106,7 +106,11 @@ public class proveedorControllerV2Test {
                                 .andExpect(jsonPath("$.telProv").value("+56921546938"))
                                 .andExpect(jsonPath("$.dirProv").value("Los Canarios 4578"))
                                 .andExpect(jsonPath("$._links.self.href").exists())
-                                .andExpect(jsonPath("$._links.proveedor.href").exists());
+                                .andExpect(jsonPath("$._links.self.href").value("http://localhost/api/v2/proveedor/5"))
+                                .andExpect(jsonPath("$._links.proveedor.href").exists())
+                                .andExpect(jsonPath("$._links.editar.href").exists())
+                                .andExpect(jsonPath("$._links.activar.href").exists())
+                                .andExpect(jsonPath("$._links.desactivar.href").exists());
         }
 
         @Test // Buscar Proveedor por ID - No hay proveedor asignado al ID
@@ -129,13 +133,6 @@ public class proveedorControllerV2Test {
                 when(pService.existePorId(0)).thenReturn(false);
                 when(pService.registrarProveedor(any(Proveedor.class))).thenReturn(registrado);
 
-                EntityModel<Proveedor> modelConLinks = EntityModel.of(registrado,
-                                linkTo(methodOn(proveedorControllerV2.class).Obtener(registrado.getIdProveedor()))
-                                                .withSelfRel(),
-                                linkTo(methodOn(proveedorControllerV2.class).listar()).withRel("proveedor"));
-
-                when(assembler.toModel(registrado)).thenReturn(modelConLinks);
-
                 mockMvc.perform(post("/api/v2/proveedor")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaTypes.HAL_JSON)
@@ -146,7 +143,11 @@ public class proveedorControllerV2Test {
                                 .andExpect(jsonPath("$.idProveedor").value(5))
                                 .andExpect(jsonPath("$.nomProv").value("Lacosta"))
                                 .andExpect(jsonPath("$.estado").value("ACTIVO"))
-                                .andExpect(jsonPath("$._links.self").exists());
+                                .andExpect(jsonPath("$._links.self.href").exists())
+                                .andExpect(jsonPath("$._links.proveedor.href").exists())
+                                .andExpect(jsonPath("$._links.editar.href").exists())
+                                .andExpect(jsonPath("$._links.activar.href").exists())
+                                .andExpect(jsonPath("$._links.desactivar.href").exists());
         }
 
         @Test // Registrar Proveedor - El ID esta en uso
@@ -174,13 +175,6 @@ public class proveedorControllerV2Test {
 
                 when(pService.actualizarInfo(eq(10), any(Proveedor.class))).thenReturn(actualizado);
 
-                EntityModel<Proveedor> modelConLinks = EntityModel.of(actualizado,
-                                linkTo(methodOn(proveedorControllerV2.class).Obtener(actualizado.getIdProveedor()))
-                                                .withSelfRel(),
-                                linkTo(methodOn(proveedorControllerV2.class).listar()).withRel("proveedor"));
-
-                when(assembler.toModel(actualizado)).thenReturn(modelConLinks);
-
                 mockMvc.perform(put("/api/v2/proveedor/10")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaTypes.HAL_JSON)
@@ -190,7 +184,12 @@ public class proveedorControllerV2Test {
                                 .andExpect(jsonPath("$.idProveedor").value(10))
                                 .andExpect(jsonPath("$.nomProv").value("Marco Polo"))
                                 .andExpect(jsonPath("$.estado").value("ACTIVO"))
-                                .andExpect(jsonPath("$._links.self").exists());
+                                .andExpect(jsonPath("$._links.self.href").exists())
+                                .andExpect(jsonPath("$._links.self.href").value("http://localhost/api/v2/proveedor/10"))
+                                .andExpect(jsonPath("$._links.proveedor.href").exists())
+                                .andExpect(jsonPath("$._links.editar.href").exists())
+                                .andExpect(jsonPath("$._links.activar.href").exists())
+                                .andExpect(jsonPath("$._links.desactivar.href").exists());
         }
 
         @Test // Actualizar información del proveedor - Proveedor no encontrado
@@ -207,7 +206,7 @@ public class proveedorControllerV2Test {
                                 .andExpect(status().isNotFound());
         }
 
-        @Test
+        @Test // Actualizar información del proveedor - Error al actualizar
         void ActualizarBADV2() throws Exception {
                 Proveedor original = new Proveedor(20, "Castle", "castle@gmail.com", estadoProveedor.ACTIVO,
                                 "+56978124545", "Las amapolas 127");
@@ -229,13 +228,6 @@ public class proveedorControllerV2Test {
 
                 when(pService.activaProveedor(7)).thenReturn(p1);
 
-                EntityModel<Proveedor> modelConLinks = EntityModel.of(p1,
-                                linkTo(methodOn(proveedorControllerV2.class).Obtener(p1.getIdProveedor()))
-                                                .withSelfRel(),
-                                linkTo(methodOn(proveedorControllerV2.class).listar()).withRel("proveedor"));
-
-                when(assembler.toModel(p1)).thenReturn(modelConLinks);
-
                 mockMvc.perform(put("/api/v2/proveedor/activar/7")
                                 .accept(MediaTypes.HAL_JSON))
                                 .andExpect(status().isOk())
@@ -244,7 +236,11 @@ public class proveedorControllerV2Test {
                                 .andExpect(jsonPath("$.nomProv").value("Sis"))
                                 .andExpect(jsonPath("$.estado").value("ACTIVO"))
                                 .andExpect(jsonPath("$._links.self.href").exists())
-                                .andExpect(jsonPath("$._links.proveedor.href").exists());
+                                .andExpect(jsonPath("$._links.self.href").value("http://localhost/api/v2/proveedor/7"))
+                                .andExpect(jsonPath("$._links.proveedor.href").exists())
+                                .andExpect(jsonPath("$._links.editar.href").exists())
+                                .andExpect(jsonPath("$._links.activar.href").exists())
+                                .andExpect(jsonPath("$._links.desactivar.href").exists());
 
         }
 
@@ -265,13 +261,6 @@ public class proveedorControllerV2Test {
 
                 when(pService.desactivaProveedor(7)).thenReturn(p1);
 
-                EntityModel<Proveedor> modelConLinks = EntityModel.of(p1,
-                                linkTo(methodOn(proveedorControllerV2.class).Obtener(p1.getIdProveedor()))
-                                                .withSelfRel(),
-                                linkTo(methodOn(proveedorControllerV2.class).listar()).withRel("proveedor"));
-
-                when(assembler.toModel(p1)).thenReturn(modelConLinks);
-
                 mockMvc.perform(put("/api/v2/proveedor/desactivar/7")
                                 .accept(MediaTypes.HAL_JSON))
                                 .andExpect(status().isOk())
@@ -280,7 +269,12 @@ public class proveedorControllerV2Test {
                                 .andExpect(jsonPath("$.nomProv").value("Sis"))
                                 .andExpect(jsonPath("$.estado").value("INACTIVO"))
                                 .andExpect(jsonPath("$._links.self.href").exists())
-                                .andExpect(jsonPath("$._links.proveedor.href").exists());
+                                .andExpect(jsonPath("$._links.self.href").value("http://localhost/api/v2/proveedor/7"))
+                                .andExpect(jsonPath("$._links.proveedor.href").exists())
+                                .andExpect(jsonPath("$._links.editar.href").exists())
+                                .andExpect(jsonPath("$._links.activar.href").exists())
+                                .andExpect(jsonPath("$._links.desactivar.href").exists());
+                ;
 
         }
 
