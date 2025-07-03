@@ -3,6 +3,7 @@ package com.Proveedor.MSProveedor.service;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -120,6 +122,34 @@ class ProveedorServiceTest {
                 () -> pService.actualizarInfo(1, nuevo));
 
         assertEquals("El correo ya está registrado por otro proveedor.", exception.getMessage());
+
+        verify(pRepo, never()).save(any());
+    }
+
+    // Actualizar proveedores - Si el correo existe pero es el mismo proveedor
+    @Test
+    void TestCorreoProveedorIgual() {
+        Proveedor existente = new Proveedor(1, "Original", "igual@mail.com", estadoProveedor.ACTIVO, "1111", "Calle 1");
+        Proveedor nuevo = new Proveedor(1, "Actualizado", "igual@mail.com", estadoProveedor.ACTIVO, "9999",
+                "Calle Nueva");
+        when(pRepo.findById(1)).thenReturn(Optional.of(existente));
+        when(pRepo.findByCorreoProv("igual@mail.com")).thenReturn(existente);
+        when(pRepo.save(any())).thenAnswer(i -> i.getArgument(0));
+
+        Proveedor actualizado = pService.actualizarInfo(1, nuevo);
+
+        assertEquals("Actualizado", actualizado.getNomProv());
+        assertEquals("igual@mail.com", actualizado.getCorreoProv());
+        assertEquals("9999", actualizado.getTelProv());
+        assertEquals("Calle Nueva", actualizado.getDirProv());
+        assertEquals(estadoProveedor.ACTIVO, actualizado.getEstado());
+
+        assertSame(existente, actualizado);
+
+        verify(pRepo).findById(1);
+        verify(pRepo).findByCorreoProv("igual@mail.com");
+        verify(pRepo).save(existente);
+        verifyNoMoreInteractions(pRepo);
     }
 
     // Activar proveedores
@@ -289,6 +319,7 @@ class ProveedorServiceTest {
         assertThat(resultado).isTrue();
         verify(pRepo).existsById(id);
     }
+
     // Comprobar si el id existe - Caso que este no exista
     @Test
     void TestNoExisteElID() {

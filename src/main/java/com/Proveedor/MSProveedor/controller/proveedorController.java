@@ -26,7 +26,7 @@ public class proveedorController {
 
     @PostMapping
     public ResponseEntity<Proveedor> registrar(@RequestBody Proveedor proveedor) {
-        if (proveedor.getIdProveedor() != 0 && proveedorService.existePorId(proveedor.getIdProveedor())) {
+        if (proveedor.getIdProveedor() != 0) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         proveedor.setEstado(estadoProveedor.ACTIVO);

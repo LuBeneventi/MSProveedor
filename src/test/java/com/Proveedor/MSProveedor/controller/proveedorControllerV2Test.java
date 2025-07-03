@@ -68,7 +68,6 @@ public class proveedorControllerV2Test {
                                 .andExpect(jsonPath("_links.self").exists())
                                 .andExpect(jsonPath("_embedded.proveedorList[0]._links.self.href").exists())
                                 .andExpect(jsonPath("_embedded.proveedorList[0]._links.proveedor.href").exists())
-                                .andExpect(jsonPath("_embedded.proveedorList[0]._links.desactivar.href").exists())
                                 .andExpect(jsonPath("_embedded.proveedorList[0]._links.editar.href").exists())
                                 .andExpect(jsonPath("_embedded.proveedorList[0]._links.activar.href").exists())
                                 .andExpect(jsonPath("_embedded.proveedorList[0]._links.desactivar.href").exists())

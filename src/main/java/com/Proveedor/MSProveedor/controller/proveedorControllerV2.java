@@ -66,7 +66,7 @@ public class proveedorControllerV2 {
 
     @PostMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<EntityModel<Proveedor>> registrar(@RequestBody Proveedor proveedor) {
-        if (proveedor.getIdProveedor() != 0 && pService.existePorId(proveedor.getIdProveedor())) {
+        if (proveedor.getIdProveedor() != 0) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         proveedor.setEstado(estadoProveedor.ACTIVO);
