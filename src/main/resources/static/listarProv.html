@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Proveedores</title>
+</head>
+
+<body>
+    <h1>Lista de Proveedores</h1>
+    <h3><a href="http://localhost:8081/index.html">Inicio</a></h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>Teléfono</th>
+                <th>Dirección</th>
+                <th>Estado</th>
+                <th>Cambiar estado</th>
+            </tr>
+        </thead>
+        <tbody id="tabla-proveedores">
+            <tr>
+                <td colspan="7">Cargando...</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        fetch("http://localhost:8081/api/v2/proveedor")
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error("Error HTTP " + res.status);
+                }
+                return res.json();
+            })
+            .then(data => {
+                const lista = document.getElementById("tabla-proveedores");
+                lista.innerHTML = "";
+
+                if (!data._embedded || !data._embedded.proveedorList) {
+                    lista.innerHTML = "<tr><td colspan='6'>No hay proveedores registrados</td></tr>";
+                    return;
+                }
+
+                data._embedded.proveedorList.forEach(prov => {
+                    const li = document.createElement("tr");
+                    li.innerHTML = `
+            <td>${prov.idProveedor}</td>
+            <td>${prov.nomProv}</td>
+            <td>${prov.correoProv}</td>
+            <td>${prov.telProv}</td>
+            <td>${prov.dirProv}</td>
+            <td>${prov.estado}</td>
+            <td>
+      ${prov.estado === "ACTIVO"
+                            ? `<button onclick="cambiarEstado(${prov.idProveedor}, 'desactivar')">Desactivar</button>`
+                            : `<button onclick="cambiarEstado(${prov.idProveedor}, 'activar')">Activar</button>`}
+    </td>
+          `;
+                    lista.appendChild(li);
+                });
+            })
+            .catch(err => {
+                console.error("Error al cargar proveedores:", err);
+                document.getElementById("lista").innerHTML =
+                    "<tr><td colspan='6'>Error al cargar proveedores</td></tr>";
+            });
+    </script>
+    <script>
+  function cambiarEstado(id, accion) {
+    fetch(`http://localhost:8081/api/v2/proveedor/${accion}/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("Error al " + accion + " proveedor");
+      }
+      return res.json();
+    })
+    .then(() => {
+      alert("Proveedor " + (accion === "activar" ? "activado" : "desactivado") + " correctamente");
+      location.reload(); // Recarga la lista
+    })
+    .catch(err => {
+      console.error(err);
+      alert("No se pudo " + accion + " el proveedor");
+    });
+  }
+</script>
+
+</body>
+
+</html>
