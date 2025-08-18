@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registrar Proveedor</title>
+</head>
+<body>
+  <h1>Registrar Proveedor</h1>
+  <h3>
+    <a href="http://localhost:8081/index.html">Inicio</a>
+    <a href="http://localhost:8081/listarProv.html">Listar proveedores</a>
+  </h3>
+
+  <form id="form-proveedor">
+    <label>Nombre: <input type="text" id="nomProv" required></label><br>
+    <label>Correo: <input type="email" id="correoProv" required></label><br>
+    <label>Teléfono: <input type="text" id="telProv" required></label><br>
+    <label>Dirección: <input type="text" id="dirProv" required></label><br>
+    <button type="submit">Registrar</button>
+  </form>
+
+  <script>
+    document.getElementById("form-proveedor").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const nuevoProveedor = {
+        nomProv: document.getElementById("nomProv").value,
+        correoProv: document.getElementById("correoProv").value,
+        telProv: document.getElementById("telProv").value,
+        dirProv: document.getElementById("dirProv").value
+      };
+
+      fetch("http://localhost:8081/api/v2/proveedor", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(nuevoProveedor)
+      })
+      .then(res => {
+        if (!res.ok) {
+          throw new Error("Error al registrar proveedor");
+        }
+        return res.json();
+      })
+      .then(() => {
+        alert("Proveedor registrado con éxito ✅");
+
+        window.location.href = "http://localhost:8081/listarProv.html";
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Error al registrar proveedor ❌");
+      });
+    });
+  </script>
+</body>
+</html>
