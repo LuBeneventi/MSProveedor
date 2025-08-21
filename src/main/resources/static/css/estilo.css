@@ -1,0 +1,81 @@
+body{
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    background-color: azure;
+}
+h1{
+ font-family: Arial, Helvetica, sans-serif;
+}
+p{
+    color: chocolate;
+}
+h4{
+    font-weight: bold;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: large;
+}
+nav{
+    background-color: darkcyan;
+}
+a{
+    text-decoration: none;
+}
+#pid{
+    color: blueviolet;
+    font-weight: lighter;
+}
+.clase{
+    font-style: italic;
+    color: chartreuse;
+}
+.negritas{
+    font-weight: bolder;
+}
+.titulo{
+    background-color: aqua;
+    text-align: center;
+    padding: 3%;
+    font-size: 35px;
+    
+}
+*{
+ border: 2px;
+ margin: 3%;
+}
+.dropdown{
+    position: relative;
+    display: inline-block;
+    right: 0;
+    
+}
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    padding: 12px 16px;
+    z-index: 1;    
+  }
+  .dropdown:hover .dropdown-content {
+    display: block;
+  }
+  .dropbtn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+  }
+  /* Change color of dropdown links on hover */
+.dropdown-content a:hover {background-color: #f1f1f1}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* Change the background color of the dropdown button when the dropdown content is shown */
+.dropdown:hover .dropbtn {
+  background-color: #3e8e41;
+}
